@@ -15,7 +15,7 @@ type AccountDetail struct {
 	AppEndUserId   string      `json:"app_end_user_id" validate:"required"`
 	AppInstallDate string      `json:"app_install_date" validate:"required"`
 	Email          string      `json:"email" validate:"required,email"`
-	Phone          string      `json:"phone" validate:"required,e164	"`
+	Phone          string      `json:"phone" validate:"required,e164"`
 	SignupLogin    SignupLogin `json:"signup_login" validate:"required"`
 }
 
@@ -44,5 +44,5 @@ type PaymentDetails struct {
 type DestinationWallet struct {
 	Currency string `json:"currency" validate:"required"`
 	Address  string `json:"address" validate:"required"`
-	Tag      string `json:"tag" validate:"required"`
+	Tag      string `json:"tag"`
 }
