@@ -17,46 +17,40 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://sandbox.test-simplexcc.com/wallet/merchant"
-	DefaultTimeout = 60 * time.Second
+	defaultBaseURL          = "https://sandbox.test-simplexcc.com/wallet/merchant"
+	defaultAuthHeaderPrefix = "apiKey"
+	defaultTimeout          = 60 * time.Second
 )
 
 type Client struct {
-	client            *http.Client
-	defaultRootURL    string
-	customHTTPHeaders map[string]string
+	client  *http.Client
+	rootURL string
+	apiKey  string
 }
 
 var validate *validator.Validate
 
-func NewClient(baseURL *string, client *http.Client, httpHeaders map[string]string) (*Client, error) {
+func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (*Client, error) {
+
 	if client == nil {
 		transport := &http.Transport{
 			DialContext: (&net.Dialer{
-				Timeout: DefaultTimeout,
+				Timeout: defaultTimeout,
 			}).DialContext,
-			TLSHandshakeTimeout: DefaultTimeout,
+			TLSHandshakeTimeout: defaultTimeout,
 		}
 		client = &http.Client{
-			Timeout:   DefaultTimeout,
+			Timeout:   defaultTimeout,
 			Transport: transport,
 		}
-	}
-
-	if validate == nil {
-		validate = validator.New()
 	}
 
 	simplex := new(Client)
 	simplex.client = client
 
-	var rootURL string
-	if baseURL != nil {
-		rootURL = *baseURL
-	} else if urlFromEnv := os.Getenv("SIMPLEX_URL"); urlFromEnv != "" {
-		rootURL = urlFromEnv
-	} else {
-		rootURL = defaultBaseURL
+	rootURL, err := getValue(baseURL, defaultBaseURL, "SIMPLEX_URL")
+	if err != nil {
+		return nil, fmt.Errorf("reading simplex url: %w", err)
 	}
 
 	url, err := url.ParseRequestURI(rootURL)
@@ -64,10 +58,42 @@ func NewClient(baseURL *string, client *http.Client, httpHeaders map[string]stri
 		return nil, fmt.Errorf("parsing URL: %w", err)
 	}
 
-	simplex.defaultRootURL = url.String()
-	simplex.customHTTPHeaders = httpHeaders
+	simplex.rootURL = url.String()
+
+	authPrefixHeaderValue, err := getValue(authHeaderPrefix, defaultAuthHeaderPrefix, "SIMPLEX_AUTHORIZATION_HEADER_PREFIX")
+	if err != nil {
+		return nil, fmt.Errorf("reading authPrefixHeader: %w", err)
+	}
+
+	apiKeyValue, err := getValue(apiKey, "", "SIMPLEX_APIKEY")
+	if err != nil {
+		return nil, fmt.Errorf("reading apiKey: %w", err)
+	}
+
+	simplex.apiKey = authPrefixHeaderValue + " " + apiKeyValue
+
+	if validate == nil {
+		validate = validator.New()
+	}
+	fmt.Printf("%v\n", simplex)
 
 	return simplex, nil
+}
+
+func getValue(value *string, defaultValue, envKey string) (string, error) {
+	var v string
+	if value != nil {
+		v = *value
+	} else if vFromEnv := os.Getenv(envKey); vFromEnv != "" {
+		v = vFromEnv
+	} else {
+		v = defaultValue
+	}
+
+	if v == "" {
+		return "", fmt.Errorf("empty value not allowed")
+	}
+	return v, nil
 }
 
 func (c *Client) newRequest(method, resource string, body interface{}) (*http.Request, error) {
@@ -95,16 +121,14 @@ func (c *Client) newRequest(method, resource string, body interface{}) (*http.Re
 		}
 	}
 
-	reqURL := c.defaultRootURL + resource
+	reqURL := c.rootURL + resource
 
 	req, err := http.NewRequest(method, reqURL, bytes.NewBuffer(b))
 	if err != nil {
 		return nil, err
 	}
 
-	for k, v := range c.customHTTPHeaders {
-		req.Header.Set(k, v)
-	}
+	req.Header.Set("Authorization", c.apiKey)
 
 	if body != nil {
 		req.Header.Add("Content-Type", "application/json")
@@ -158,7 +182,7 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 
 	if len(body) == 0 {
 		errResp.StatusCode = http.StatusBadRequest
-		errResp.Messages = []string{fmt.Sprintf("check if server supports the requested  URL: %s", reqURL)}
+		errResp.Messages = []string{fmt.Sprintf("check if server supports the requested URL: %s", reqURL)}
 		return &errResp
 	}
 
