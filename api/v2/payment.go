@@ -26,7 +26,7 @@ type SignupLogin struct {
 	HttpAcceptLanguage string `json:"http_accept_language" validate:"required"`
 	UserAgent          string `json:"user_agent" validate:"required"`
 	CookieSessionId    string `json:"cookie_session_id" validate:"required"`
-	Timestamp          string `json:"timestamp" validate:"required,datetime"`
+	Timestamp          string `json:"timestamp" validate:"required"`
 	Ip                 string `json:"ip" validate:"required,ip4_addr"`
 }
 
