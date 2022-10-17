@@ -75,7 +75,6 @@ func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (
 	if validate == nil {
 		validate = validator.New()
 	}
-	fmt.Printf("%v\n", simplex)
 
 	return simplex, nil
 }
