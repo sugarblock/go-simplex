@@ -105,14 +105,14 @@ func (c *Client) newRequest(method, resource string, body interface{}) (*http.Re
 	if body != nil {
 		err := validate.Struct(body)
 		if err != nil {
-			var errResp types.ErrorResponse
-			errResp.StatusCode = -1
+			var respErr types.ResponseError
+
 			messages := []string{}
 			for _, err := range err.(validator.ValidationErrors) {
 				messages = append(messages, fmt.Sprintf("%s:%s:%s", err.Kind().String(), err.Namespace(), err.ActualTag()))
 			}
-			errResp.Messages = messages
-			return nil, &errResp
+			respErr.Messages = messages
+			return nil, &respErr
 		}
 
 		b, err = json.Marshal(body)
@@ -185,7 +185,7 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 	}
 
 	var simplexErr v2.SimplexError
-	err = json.NewDecoder(resp.Body).Decode(simplexErr)
+	err = json.NewDecoder(resp.Body).Decode(&simplexErr)
 	if err != nil {
 		return err
 	}
