@@ -16,5 +16,5 @@ type SimplexParamsError struct {
 }
 
 func (e SimplexError) Error() string {
-	return fmt.Sprintf("StatusCode: %d:\n Error:%s\n Errors: %#v", e.StatusCode, *e.ErrorMessage, e.Errors)
+	return fmt.Sprintf("StatusCode: %d:\n Error:%s\n Errors: %#v", *e.StatusCode, *e.ErrorMessage, e.Errors)
 }

@@ -185,7 +185,7 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 	}
 
 	var simplexErr v2.SimplexError
-	err = json.NewDecoder(resp.Body).Decode(&simplexErr)
+	err = json.Unmarshal(body, &simplexErr)
 	if err != nil {
 		return err
 	}
