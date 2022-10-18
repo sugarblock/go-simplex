@@ -1,12 +1,16 @@
 package types
 
-import "fmt"
+import (
+	"fmt"
 
-type ErrorResponse struct {
-	StatusCode int      `json:"statusCode"`
-	Messages   []string `json:"messages"`
+	v2 "github.com/sugarblock/go-simplex/api/v2"
+)
+
+type ResponseError struct {
+	Messages     []string         `json:"messages,omitempty"`
+	SimplexError *v2.SimplexError `json:"simplexError,omitempty"`
 }
 
-func (e ErrorResponse) Error() string {
-	return fmt.Sprintf("StatusCode: %d:\n %+q", e.StatusCode, e.Messages)
+func (e ResponseError) Error() string {
+	return fmt.Sprintf("StatusCode: %#v:\n %+q", e.SimplexError, e.Messages)
 }

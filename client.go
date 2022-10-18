@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/go-playground/validator"
+	v2 "github.com/sugarblock/go-simplex/api/v2"
 	"github.com/sugarblock/go-simplex/types"
 )
 
@@ -170,23 +171,25 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 		return nil
 	}
 
-	var errResp types.ErrorResponse
+	var respErr types.ResponseError
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		errResp.StatusCode = -1
-		errResp.Messages = []string{err.Error()}
-		return &errResp
+		respErr.Messages = []string{err.Error()}
+		return &respErr
 	}
 
 	if len(body) == 0 {
-		errResp.StatusCode = http.StatusBadRequest
-		errResp.Messages = []string{fmt.Sprintf("check if server supports the requested URL: %s", reqURL)}
-		return &errResp
+		respErr.Messages = []string{fmt.Sprintf("check if server supports the requested URL: %s", reqURL)}
+		return &respErr
 	}
 
-	errResp.StatusCode = resp.StatusCode
-	errResp.Messages = []string{resp.Status}
+	var simplexErr v2.SimplexError
+	err = json.NewDecoder(resp.Body).Decode(simplexErr)
+	if err != nil {
+		return err
+	}
+	simplexErr.StatusCode = &resp.StatusCode
 
-	return &errResp
+	return &simplexErr
 }
