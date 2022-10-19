@@ -51,24 +51,28 @@ func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (
 
 	rootURL, err := getValue(baseURL, defaultBaseURL, "SIMPLEX_URL")
 	if err != nil {
-		return nil, fmt.Errorf("reading simplex url: %w", err)
+		msg := fmt.Sprintf("reading simplex url: %s", err.Error())
+		return nil, &types.EnvError{Message: &msg}
 	}
 
 	url, err := url.ParseRequestURI(rootURL)
 	if err != nil {
-		return nil, fmt.Errorf("parsing URL: %w", err)
+		msg := fmt.Sprintf("parsing URL: %s", err.Error())
+		return nil, &types.ParsingUrlError{Message: &msg}
 	}
 
 	simplex.rootURL = url.String()
 
 	authPrefixHeaderValue, err := getValue(authHeaderPrefix, defaultAuthHeaderPrefix, "SIMPLEX_AUTHORIZATION_HEADER_PREFIX")
 	if err != nil {
-		return nil, fmt.Errorf("reading authPrefixHeader: %w", err)
+		msg := fmt.Sprintf("reading authPrefixHeader: %s", err.Error())
+		return nil, &types.EnvError{Message: &msg}
 	}
 
 	apiKeyValue, err := getValue(apiKey, "", "SIMPLEX_APIKEY")
 	if err != nil {
-		return nil, fmt.Errorf("reading apiKey: %w", err)
+		msg := fmt.Sprintf("reading apiKey: %s", err.Error())
+		return nil, &types.EnvError{Message: &msg}
 	}
 
 	simplex.apiKey = authPrefixHeaderValue + " " + apiKeyValue
@@ -105,14 +109,14 @@ func (c *Client) newRequest(method, resource string, body interface{}) (*http.Re
 	if body != nil {
 		err := validate.Struct(body)
 		if err != nil {
-			var respErr types.ResponseError
+			var valErr types.ValidationError
 
 			messages := []string{}
 			for _, err := range err.(validator.ValidationErrors) {
 				messages = append(messages, fmt.Sprintf("%s:%s:%s", err.Kind().String(), err.Namespace(), err.ActualTag()))
 			}
-			respErr.Messages = messages
-			return nil, &respErr
+			valErr.Messages = &messages
+			return nil, &valErr
 		}
 
 		b, err = json.Marshal(body)
@@ -171,17 +175,13 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 		return nil
 	}
 
-	var respErr types.ResponseError
-
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		respErr.Messages = []string{err.Error()}
-		return &respErr
+		return err
 	}
 
 	if len(body) == 0 {
-		respErr.Messages = []string{fmt.Sprintf("check if server supports the requested URL: %s", reqURL)}
-		return &respErr
+		return fmt.Errorf("check if server supports the requested URL: %s", reqURL)
 	}
 
 	var simplexErr v2.SimplexError
@@ -189,6 +189,7 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 	if err != nil {
 		return err
 	}
+
 	simplexErr.StatusCode = &resp.StatusCode
 
 	return &simplexErr

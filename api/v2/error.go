@@ -1,6 +1,9 @@
 package v2
 
-import "fmt"
+import (
+	"encoding/json"
+	"fmt"
+)
 
 type SimplexError struct {
 	StatusCode   *int                  `json:"statusCode,omitempty"`
@@ -16,5 +19,12 @@ type SimplexParamsError struct {
 }
 
 func (e SimplexError) Error() string {
-	return fmt.Sprintf("StatusCode: %d:\n Error:%s\n Errors: %#v", *e.StatusCode, *e.ErrorMessage, e.Errors)
+	out, err := json.Marshal(e)
+	if err != nil {
+		panic(err)
+	}
+
+	return fmt.Sprintf("%s: %s", e.ErrorCode(), string(out))
 }
+
+func (e *SimplexError) ErrorCode() string { return "SimplexError" }
