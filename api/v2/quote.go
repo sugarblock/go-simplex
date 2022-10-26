@@ -1,13 +1,13 @@
 package v2
 
 type QuoteRequest struct {
-	EndUserId         string    `json:"end_user_id" validate:"required"`
-	DigitalCurrency   string    `json:"digital_currency" validate:"required"`
-	FiatCurrency      string    `json:"fiat_currency" validate:"required"`
-	RequestedCurrency string    `json:"requested_currency" validate:"required"`
-	RequestedAmount   float32   `json:"requested_amount" validate:"required"`
-	WalletId          string    `json:"wallet_id" validate:"required"`
-	ClientIp          string    `json:"client_ip" validate:"required"`
+	EndUserId         string    `json:"end_user_id"`
+	DigitalCurrency   string    `json:"digital_currency"`
+	FiatCurrency      string    `json:"fiat_currency"`
+	RequestedCurrency string    `json:"requested_currency"`
+	RequestedAmount   float32   `json:"requested_amount"`
+	WalletId          string    `json:"wallet_id"`
+	ClientIp          string    `json:"client_ip"`
 	PaymentMethods    *[]string `json:"payment_methods,omitempty"`
 }
 
@@ -22,12 +22,12 @@ type QuoteResponse struct {
 }
 
 type DigitalMoney struct {
-	Currency string  `json:"currency" validate:"required,alpha"`
-	Amount   float32 `json:"amount" validate:"required,numeric"`
+	Currency string  `json:"currency"`
+	Amount   float32 `json:"amount"`
 }
 
 type FiatMoney struct {
-	Currency    string  `json:"currency" validate:"required,alpha"`
-	BaseAmount  float32 `json:"base_amount" validate:"required,numeric"`
-	TotalAmount float32 `json:"total_amount" validate:"required,numeric"`
+	Currency    string  `json:"currency"`
+	BaseAmount  float32 `json:"base_amount"`
+	TotalAmount float32 `json:"total_amount"`
 }

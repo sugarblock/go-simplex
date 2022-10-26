@@ -15,14 +15,6 @@ func (c *Client) GetPayment(ctx context.Context, reqv2 *v2.PaymentRequest) (*v2.
 
 	req, err := c.newRequest(method, queryPath, reqv2)
 	if err != nil {
-		if validationErr := new(types.ValidationError); !errors.As(err, &validationErr) {
-			var reqErr types.RequestError
-
-			msg := fmt.Sprintf("request error: %s", err.Error())
-			reqErr.Message = &msg
-
-			return nil, &reqErr
-		}
 		return nil, err
 	}
 

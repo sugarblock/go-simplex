@@ -12,7 +12,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-playground/validator"
 	v2 "github.com/sugarblock/go-simplex/api/v2"
 	"github.com/sugarblock/go-simplex/types"
 )
@@ -28,8 +27,6 @@ type Client struct {
 	rootURL string
 	apiKey  string
 }
-
-var validate *validator.Validate
 
 func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (*Client, error) {
 
@@ -77,10 +74,6 @@ func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (
 
 	simplex.apiKey = authPrefixHeaderValue + " " + apiKeyValue
 
-	if validate == nil {
-		validate = validator.New()
-	}
-
 	return simplex, nil
 }
 
@@ -107,18 +100,7 @@ func (c *Client) newRequest(method, resource string, body interface{}) (*http.Re
 
 	var b []byte
 	if body != nil {
-		err := validate.Struct(body)
-		if err != nil {
-			var valErr types.ValidationError
-
-			messages := []string{}
-			for _, err := range err.(validator.ValidationErrors) {
-				messages = append(messages, fmt.Sprintf("%s:%s:%s", err.Kind().String(), err.Namespace(), err.ActualTag()))
-			}
-			valErr.Messages = &messages
-			return nil, &valErr
-		}
-
+		var err error
 		b, err = json.Marshal(body)
 		if err != nil {
 			return nil, err

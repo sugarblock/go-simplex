@@ -1,7 +1,6 @@
 package types
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -72,18 +71,3 @@ func (e *EnvError) ErrorMessage() string {
 }
 
 func (e *EnvError) ErrorCode() string { return "EnvError" }
-
-type ValidationError struct {
-	Messages *[]string `json:"messages,omitempty"`
-}
-
-func (e ValidationError) Error() string {
-	out, err := json.Marshal(e)
-	if err != nil {
-		panic(err)
-	}
-
-	return fmt.Sprintf("%s: %s", e.ErrorCode(), string(out))
-}
-
-func (e *ValidationError) ErrorCode() string { return "ValidationError" }
