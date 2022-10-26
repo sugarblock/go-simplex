@@ -9,7 +9,7 @@ import (
 	"github.com/sugarblock/go-simplex/types"
 )
 
-func (c *Client) GetPayment(ctx context.Context, reqv2 *v2.PaymentRequest) (*v2.PaymentResponse, error) {
+func (c *Client) PaymentRequest(ctx context.Context, reqv2 *v2.PaymentRequest) (*v2.PaymentResponse, error) {
 	queryPath := "/v2/payments/partner/data"
 	method := "POST"
 
