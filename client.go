@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
 	"net/url"
@@ -137,6 +137,8 @@ func (c *Client) do(ctx context.Context, req *http.Request, v interface{}) error
 		return fmt.Errorf("making HTTP request: %w", err)
 	}
 
+	defer resp.Body.Close()
+
 	err = c.checkResponse(resp, req.URL.RawPath)
 	if err != nil {
 		return err
@@ -157,7 +159,7 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 		return nil
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return err
 	}

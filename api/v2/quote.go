@@ -1,14 +1,14 @@
 package v2
 
 type QuoteRequest struct {
-	EndUserId         string    `json:"end_user_id"`
-	DigitalCurrency   string    `json:"digital_currency"`
-	FiatCurrency      string    `json:"fiat_currency"`
-	RequestedCurrency string    `json:"requested_currency"`
-	RequestedAmount   float32   `json:"requested_amount"`
-	WalletId          string    `json:"wallet_id"`
-	ClientIp          string    `json:"client_ip"`
-	PaymentMethods    *[]string `json:"payment_methods,omitempty"`
+	EndUserId         string   `json:"end_user_id"`
+	DigitalCurrency   string   `json:"digital_currency"`
+	FiatCurrency      string   `json:"fiat_currency"`
+	RequestedCurrency string   `json:"requested_currency"`
+	RequestedAmount   float32  `json:"requested_amount"`
+	WalletId          string   `json:"wallet_id"`
+	ClientIp          string   `json:"client_ip"`
+	PaymentMethods    []string `json:"payment_methods,omitempty"`
 }
 
 type QuoteResponse struct {
