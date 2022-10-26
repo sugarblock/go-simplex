@@ -10,23 +10,23 @@ type PaymentResponse struct {
 }
 
 type AccountDetail struct {
-	AppProviderId  string      `json:"app_provider_id" validate:"required"`
+	AppProviderId  string      `json:"app_provider_id"`
 	AppVersionId   string      `json:"app_version_id" validate:"required"`
 	AppEndUserId   string      `json:"app_end_user_id" validate:"required"`
-	AppInstallDate string      `json:"app_install_date" validate:"required"`
-	Email          string      `json:"email" validate:"required,email"`
-	Phone          string      `json:"phone" validate:"required,e164"`
+	AppInstallDate string      `json:"app_install_date"`
+	Email          string      `json:"email" validate:"email"`
+	Phone          string      `json:"phone" validate:"e164"`
 	SignupLogin    SignupLogin `json:"signup_login" validate:"required"`
 }
 
 type SignupLogin struct {
-	Location           string `json:"location" validate:"required"`
-	Uaid               string `json:"uaid" validate:"required"`
-	AcceptLanguage     string `json:"accept_language" validate:"required"`
-	HttpAcceptLanguage string `json:"http_accept_language" validate:"required"`
-	UserAgent          string `json:"user_agent" validate:"required"`
-	CookieSessionId    string `json:"cookie_session_id" validate:"required"`
-	Timestamp          string `json:"timestamp" validate:"required"`
+	Location           string `json:"location"`
+	Uaid               string `json:"uaid"`
+	AcceptLanguage     string `json:"accept_language"`
+	HttpAcceptLanguage string `json:"http_accept_language"`
+	UserAgent          string `json:"user_agent"`
+	CookieSessionId    string `json:"cookie_session_id"`
+	Timestamp          string `json:"timestamp"`
 	Ip                 string `json:"ip" validate:"required,ip4_addr"`
 }
 
