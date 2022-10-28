@@ -2,7 +2,6 @@ package v2
 
 import (
 	"encoding/json"
-	"fmt"
 )
 
 type SimplexError struct {
@@ -24,7 +23,7 @@ func (e SimplexError) Error() string {
 		panic(err)
 	}
 
-	return fmt.Sprintf("%s: %s", e.ErrorCode(), string(out))
+	return string(out)
 }
 
 func (e *SimplexError) ErrorCode() string { return "SimplexError" }

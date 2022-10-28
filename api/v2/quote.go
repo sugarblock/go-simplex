@@ -12,13 +12,14 @@ type QuoteRequest struct {
 }
 
 type QuoteResponse struct {
-	UserId                     *string       `json:"user_id"`
-	QuoteId                    *string       `json:"quote_id"`
-	WalletId                   *string       `json:"wallet_id"`
-	DigitalMoney               *DigitalMoney `json:"digital_money"`
-	FiatMoney                  *FiatMoney    `json:"fiat_money"`
-	ValidUntil                 *string       `json:"valid_until"`
-	SupportedDigitalCurrencies *[]string     `json:"supported_digital_currencies"`
+	UserId                     *string       `json:"user_id,omitempty"`
+	QuoteId                    *string       `json:"quote_id,omitempty"`
+	WalletId                   *string       `json:"wallet_id,omitempty"`
+	DigitalMoney               *DigitalMoney `json:"digital_money,omitempty"`
+	FiatMoney                  *FiatMoney    `json:"fiat_money,omitempty"`
+	ValidUntil                 *string       `json:"valid_until,omitempty"`
+	SupportedDigitalCurrencies *[]string     `json:"supported_digital_currencies,omitempty"`
+	Error                      *string       `json:"error,omitempty"`
 }
 
 type DigitalMoney struct {
