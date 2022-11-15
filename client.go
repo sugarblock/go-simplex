@@ -8,28 +8,22 @@ import (
 	"io"
 	"net"
 	"net/http"
-	"net/url"
-	"os"
 	"time"
 
 	v2 "github.com/sugarblock/go-simplex/api/v2"
-	"github.com/sugarblock/go-simplex/types"
 )
 
 const (
-	defaultBaseURL          = "https://sandbox.test-simplexcc.com/wallet/merchant"
-	defaultAuthHeaderPrefix = "apiKey"
-	defaultTimeout          = 60 * time.Second
+	defaultTimeout = 60 * time.Second
 )
 
 type Client struct {
 	client  *http.Client
 	rootURL string
-	apiKey  string
+	bearer  string
 }
 
 func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (*Client, error) {
-
 	if client == nil {
 		transport := &http.Transport{
 			DialContext: (&net.Dialer{
@@ -46,51 +40,15 @@ func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (
 	simplex := new(Client)
 	simplex.client = client
 
-	rootURL, err := getValue(baseURL, defaultBaseURL, "SIMPLEX_URL")
+	config, err := newConfigFromEnv()
 	if err != nil {
-		msg := fmt.Sprintf("reading simplex url: %s", err.Error())
-		return nil, &types.EnvError{Message: &msg}
+		return nil, err
 	}
 
-	url, err := url.ParseRequestURI(rootURL)
-	if err != nil {
-		msg := fmt.Sprintf("parsing URL: %s", err.Error())
-		return nil, &types.ParsingUrlError{Message: &msg}
-	}
-
-	simplex.rootURL = url.String()
-
-	authPrefixHeaderValue, err := getValue(authHeaderPrefix, defaultAuthHeaderPrefix, "SIMPLEX_AUTHORIZATION_HEADER_PREFIX")
-	if err != nil {
-		msg := fmt.Sprintf("reading authPrefixHeader: %s", err.Error())
-		return nil, &types.EnvError{Message: &msg}
-	}
-
-	apiKeyValue, err := getValue(apiKey, "", "SIMPLEX_APIKEY")
-	if err != nil {
-		msg := fmt.Sprintf("reading apiKey: %s", err.Error())
-		return nil, &types.EnvError{Message: &msg}
-	}
-
-	simplex.apiKey = authPrefixHeaderValue + " " + apiKeyValue
+	simplex.rootURL = config.URL.String()
+	simplex.bearer = config.HeaderAuthPrefix + " " + config.ApiKey
 
 	return simplex, nil
-}
-
-func getValue(value *string, defaultValue, envKey string) (string, error) {
-	var v string
-	if value != nil {
-		v = *value
-	} else if vFromEnv := os.Getenv(envKey); vFromEnv != "" {
-		v = vFromEnv
-	} else {
-		v = defaultValue
-	}
-
-	if v == "" {
-		return "", fmt.Errorf("empty value not allowed")
-	}
-	return v, nil
 }
 
 func (c *Client) newRequest(method, resource string, body interface{}) (*http.Request, error) {
@@ -114,7 +72,7 @@ func (c *Client) newRequest(method, resource string, body interface{}) (*http.Re
 		return nil, err
 	}
 
-	req.Header.Set("Authorization", c.apiKey)
+	req.Header.Set("Authorization", c.bearer)
 
 	if body != nil {
 		req.Header.Add("Content-Type", "application/json")
