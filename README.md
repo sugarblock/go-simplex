@@ -16,6 +16,12 @@ Then import the go-simplex package into your own code.
 
 ## Usage
 
+Set **apikey** environment variable
+
+```
+$ export SIMPLEX_APIKEY=''
+```
+
 ### GetAllEvent:
 
 ```go
