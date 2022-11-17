@@ -37,7 +37,7 @@ func newConfigFromEnv() (*Config, error) {
 
 	apiKey := os.Getenv("SIMPLEX_APIKEY")
 	if apiKey == "" {
-		msg := "you must provide an apiKey"
+		msg := "SIMPLEX_APIKEY: you must provide an apiKey"
 		return nil, &types.EnvError{Message: &msg}
 	}
 

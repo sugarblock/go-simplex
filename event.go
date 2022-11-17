@@ -9,7 +9,7 @@ import (
 	"github.com/sugarblock/go-simplex/types"
 )
 
-func (c *Client) GetAllEvent(ctx context.Context) (*v2.EventResponse, error) {
+func (c *Client) GetAllEvents(ctx context.Context) (*v2.EventResponse, error) {
 	queryPath := "/v2/events"
 	method := "GET"
 
