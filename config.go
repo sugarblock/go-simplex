@@ -10,7 +10,7 @@ import (
 
 const (
 	defaultBaseURL          = "https://sandbox.test-simplexcc.com/wallet/merchant"
-	defaultAuthHeaderPrefix = "apiKey"
+	defaultAuthHeaderPrefix = "ApiKey"
 )
 
 type Config struct {

@@ -94,6 +94,7 @@ func (c *Client) newRequest(method, resource string, body interface{}) (*http.Re
 	}
 
 	req.Header.Set("Authorization", c.bearer)
+	req.Header.Set("Accept", "application/json")
 
 	if body != nil {
 		req.Header.Add("Content-Type", "application/json")
