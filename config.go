@@ -25,10 +25,9 @@ func newConfigFromEnv() (*Config, error) {
 		simplexUrl = defaultBaseURL
 	}
 
-	url, err := url.ParseRequestURI(simplexUrl)
+	url, err := ParseBaseURL(simplexUrl)
 	if err != nil {
-		msg := fmt.Sprintf("parsing URL: %s", err.Error())
-		return nil, &types.ParsingUrlError{Message: &msg}
+		return nil, err
 	}
 
 	headerAuthPrefix := os.Getenv("SIMPLEX_AUTHORIZATION_HEADER_PREFIX")
@@ -47,4 +46,13 @@ func newConfigFromEnv() (*Config, error) {
 		HeaderAuthPrefix: headerAuthPrefix,
 		ApiKey:           apiKey,
 	}, nil
+}
+
+func ParseBaseURL(basURL string) (*url.URL, error) {
+	url, err := url.Parse(basURL)
+	if err != nil {
+		msg := fmt.Sprintf("parsing URL: %s", err.Error())
+		return nil, &types.ParsingUrlError{Message: &msg}
+	}
+	return url, nil
 }

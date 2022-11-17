@@ -35,13 +35,12 @@ import (
 )
 
 func main() {
-	cli, err := simplex.NewClient(nil, nil, nil, nil)
+	cli, err := simplex.NewEnvClient()
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	events, err := cli.GetAllEvent(context.TODO())
-
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -53,4 +52,4 @@ func main() {
 
 ## License
 
-MIT
+Apache License 2.0

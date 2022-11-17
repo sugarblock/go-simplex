@@ -23,7 +23,20 @@ type Client struct {
 	bearer  string
 }
 
-func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (*Client, error) {
+func NewEnvClient() (*Client, error) {
+	config, err := newConfigFromEnv()
+	if err != nil {
+		return nil, err
+	}
+
+	baseURL := config.URL.String()
+	authHeaderPrefix := config.HeaderAuthPrefix
+	apiKey := config.ApiKey
+
+	return NewClient(nil, baseURL, authHeaderPrefix, apiKey)
+}
+
+func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey string) (*Client, error) {
 	if client == nil {
 		transport := &http.Transport{
 			DialContext: (&net.Dialer{
@@ -40,13 +53,21 @@ func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey *string) (
 	simplex := new(Client)
 	simplex.client = client
 
-	config, err := newConfigFromEnv()
+	url, err := ParseBaseURL(baseURL)
 	if err != nil {
 		return nil, err
 	}
 
-	simplex.rootURL = config.URL.String()
-	simplex.bearer = config.HeaderAuthPrefix + " " + config.ApiKey
+	if apiKey == "" {
+		return nil, fmt.Errorf("apiKey must not be empty")
+	}
+
+	if authHeaderPrefix == "" {
+		return nil, fmt.Errorf("authHeaderPrefix must not be empty")
+	}
+
+	simplex.rootURL = url.String()
+	simplex.bearer = authHeaderPrefix + " " + apiKey
 
 	return simplex, nil
 }
