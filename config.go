@@ -10,7 +10,7 @@ import (
 
 const (
 	defaultBaseURL          = "https://sandbox.test-simplexcc.com/wallet/merchant"
-	defaultAuthHeaderPrefix = "apiKey"
+	defaultAuthHeaderPrefix = "ApiKey"
 )
 
 type Config struct {
@@ -25,10 +25,9 @@ func newConfigFromEnv() (*Config, error) {
 		simplexUrl = defaultBaseURL
 	}
 
-	url, err := url.ParseRequestURI(simplexUrl)
+	url, err := ParseBaseURL(simplexUrl)
 	if err != nil {
-		msg := fmt.Sprintf("parsing URL: %s", err.Error())
-		return nil, &types.ParsingUrlError{Message: &msg}
+		return nil, err
 	}
 
 	headerAuthPrefix := os.Getenv("SIMPLEX_AUTHORIZATION_HEADER_PREFIX")
@@ -38,7 +37,7 @@ func newConfigFromEnv() (*Config, error) {
 
 	apiKey := os.Getenv("SIMPLEX_APIKEY")
 	if apiKey == "" {
-		msg := "you must provide an apiKey"
+		msg := "SIMPLEX_APIKEY: you must provide an apiKey"
 		return nil, &types.EnvError{Message: &msg}
 	}
 
@@ -47,4 +46,13 @@ func newConfigFromEnv() (*Config, error) {
 		HeaderAuthPrefix: headerAuthPrefix,
 		ApiKey:           apiKey,
 	}, nil
+}
+
+func ParseBaseURL(basURL string) (*url.URL, error) {
+	url, err := url.Parse(basURL)
+	if err != nil {
+		msg := fmt.Sprintf("parsing URL: %s", err.Error())
+		return nil, &types.ParsingUrlError{Message: &msg}
+	}
+	return url, nil
 }
