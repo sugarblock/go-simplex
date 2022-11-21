@@ -8,6 +8,8 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/http/httputil"
+	"os"
 	"time"
 
 	v2 "github.com/sugarblock/go-simplex/api/v2"
@@ -21,6 +23,9 @@ type Client struct {
 	client  *http.Client
 	rootURL string
 	bearer  string
+
+	debug  bool
+	logger io.Writer
 }
 
 func NewEnvClient() (*Client, error) {
@@ -68,6 +73,7 @@ func NewClient(client *http.Client, baseURL, authHeaderPrefix, apiKey string) (*
 
 	simplex.rootURL = url.String()
 	simplex.bearer = authHeaderPrefix + " " + apiKey
+	simplex.logger = os.Stderr
 
 	return simplex, nil
 }
@@ -112,12 +118,22 @@ func (c *Client) do(ctx context.Context, req *http.Request, v interface{}) error
 		req = req.WithContext(ctx)
 	}
 
+	err = c.logRequest(req)
+	if err != nil {
+		return fmt.Errorf("logging HTTP request: %w", err)
+	}
+
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return fmt.Errorf("making HTTP request: %w", err)
 	}
 
 	defer resp.Body.Close()
+
+	err = c.logResponse(resp)
+	if err != nil {
+		return fmt.Errorf("logging HTTP response: %w", err)
+	}
 
 	err = c.checkResponse(resp, req.URL.RawPath)
 	if err != nil {
@@ -157,4 +173,32 @@ func (c *Client) checkResponse(resp *http.Response, reqURL string) error {
 	simplexErr.StatusCode = &resp.StatusCode
 
 	return &simplexErr
+}
+
+func (c *Client) SetDebugMode(enableDebug bool) {
+	c.debug = enableDebug
+}
+
+func (c *Client) logRequest(r *http.Request) error {
+	if !c.debug {
+		return nil
+	}
+	dump, err := httputil.DumpRequestOut(r, true)
+	if err != nil {
+		return err
+	}
+	_, err = c.logger.Write(append(dump, '\n'))
+	return err
+}
+
+func (c *Client) logResponse(r *http.Response) error {
+	if !c.debug {
+		return nil
+	}
+	dump, err := httputil.DumpResponse(r, true)
+	if err != nil {
+		return err
+	}
+	_, err = c.logger.Write(append(dump, '\n'))
+	return err
 }
