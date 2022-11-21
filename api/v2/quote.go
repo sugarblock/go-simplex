@@ -1,14 +1,14 @@
 package v2
 
 type QuoteRequest struct {
-	EndUserId         string   `json:"end_user_id"`
-	DigitalCurrency   string   `json:"digital_currency"`
-	FiatCurrency      string   `json:"fiat_currency"`
-	RequestedCurrency string   `json:"requested_currency"`
-	RequestedAmount   float32  `json:"requested_amount"`
-	WalletId          string   `json:"wallet_id"`
-	ClientIp          string   `json:"client_ip"`
-	PaymentMethods    []string `json:"payment_methods,omitempty"`
+	EndUserId         *string   `json:"end_user_id,omitempty"`
+	DigitalCurrency   *string   `json:"digital_currency,omitempty"`
+	FiatCurrency      *string   `json:"fiat_currency,omitempty"`
+	RequestedCurrency *string   `json:"requested_currency,omitempty"`
+	RequestedAmount   *float32  `json:"requested_amount,omitempty"`
+	WalletId          *string   `json:"wallet_id,omitempty"`
+	ClientIp          *string   `json:"client_ip,omitempty"`
+	PaymentMethods    *[]string `json:"payment_methods,omitempty"`
 }
 
 type QuoteResponse struct {
@@ -23,12 +23,12 @@ type QuoteResponse struct {
 }
 
 type DigitalMoney struct {
-	Currency string  `json:"currency"`
-	Amount   float32 `json:"amount"`
+	Currency *string  `json:"currency,omitempty"`
+	Amount   *float32 `json:"amount,omitempty"`
 }
 
 type FiatMoney struct {
-	Currency    string  `json:"currency"`
-	BaseAmount  float32 `json:"base_amount"`
-	TotalAmount float32 `json:"total_amount"`
+	Currency    *string  `json:"currency,omitempty"`
+	BaseAmount  *float32 `json:"base_amount,omitempty"`
+	TotalAmount *float32 `json:"total_amount,omitempty"`
 }

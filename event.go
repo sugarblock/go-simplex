@@ -39,8 +39,9 @@ func (c *Client) GetAllEvents(ctx context.Context) (*v2.EventResponse, error) {
 func (c *Client) DeleteEvent(ctx context.Context, reqv2 *v2.EventRequest) (*v2.EventDeleteResponse, error) {
 	queryPath := "/v2/events"
 	method := "DELETE"
+	eventId := *reqv2.EventId
 
-	req, err := c.newRequest(method, queryPath+"/"+reqv2.EventId, nil)
+	req, err := c.newRequest(method, queryPath+"/"+eventId, nil)
 	if err != nil {
 		return nil, err
 	}
